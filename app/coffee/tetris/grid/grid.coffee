@@ -1,8 +1,10 @@
 GridConfig = require './grid-config.coffee'
 GridTheme = require './grid-theme.coffee'
 GridLayout = require './grid-layout.coffee'
+
 Case = require './case.coffee'
 
+Coordinates = require '../../utils/coordinates.coffee'
 Rectangle = require '../../utils/geometry/rectangle.coffee'
 
 assert = require '../../utils/assert.coffee'
@@ -14,21 +16,22 @@ class Grid
   constructor: (game, rectangleView, gridConfig, gridTheme) ->
     assert game?, "Game missing"
     assert rectangleView instanceof Rectangle, "rectangleView missing"
-    assert gridConfig in GridConfig, "GridConfig missing"
-    assert gridTheme in gridTheme, "GridTheme missing"
 
     @game = game
     @config = gridConfig
     @theme = gridTheme
+
     @layout = new GridLayout @game, @, rectangleView, @config
 
     # Grid initialisation
-    @tab = new Array @config.size.w
-    for i in [0..@config.size.w - 1] by 1
-      @tab[i] = new Array @config.size.h
-      for j in [0..@config.size.h - 1] by 1
+    @tab = new Array @config.size.h
+    for i in [0..@config.size.h - 1] by 1
+      @tab[i] = new Array @config.size.w
+      for j in [0..@config.size.w - 1] by 1
         coords = new Coordinates i, j
         @tab[i][j] = new Case @game, @, coords, @theme
+
+    @layout.updateCasesTransform()
 
 
   getCaseAtGameCoords: (coords) ->
@@ -46,11 +49,11 @@ class Grid
 
 
   getCaseAtGridCoords: (coords) ->
-    assert coords instanceof Coordinates, "coords missing"
+    assert coords instanceof Coordinates, "Coords missing"
 
-    if gridcoords.x >= 0 and gridcoords.x < @w
-      if gridcoords.y >= 0 and gridcoords.y < @h
-        return @tab[gridcoords.x][gridcoords.y]
+    if coords.x >= 0 and coords.x < @config.size.h
+      if coords.y >= 0 and coords.y < @config.size.w
+        return @tab[coords.x][coords.y]
 
     debug 'getCaseAtGridCoords: coords out of bounds', @, 'warning', 250, debugThemes.Grid, coords
     return null

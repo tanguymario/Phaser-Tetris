@@ -66,6 +66,10 @@ class Rectangle extends Polygon
     return @height
 
 
+  clone: ->
+    return new Rectangle @getTopLeft(), @width, @height
+
+
   toString: ->
     return """
     Rectangle :

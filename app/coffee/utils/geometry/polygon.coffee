@@ -49,6 +49,10 @@ class Polygon
     return graphics
 
 
+  clone: ->
+    return new Polygon @points
+
+
   toString: ->
     return """
     Polygon :

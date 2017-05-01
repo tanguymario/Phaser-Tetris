@@ -26,6 +26,10 @@ class Triangle extends Polygon
     return @points[2]
 
 
+  clone: ->
+    return new Triangle @getFirst(), @getSecond(), @getThird()
+
+
   toString: ->
     return """
     Triangle :

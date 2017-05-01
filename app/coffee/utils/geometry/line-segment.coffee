@@ -6,11 +6,11 @@ assert = require '../assert.coffee'
 
 class LineSegment extends Polygon
 
-  constructor: (pointA, pointB) ->
+  constructor: (start, end) ->
     assert pointA instanceof Coordinates, "PointA is not Coordinates"
     assert pointB instanceof Coordinates, "PointB is not Coordinates"
 
-    super pointA, pointB
+    super start, end
 
 
   getStart: ->
@@ -21,12 +21,16 @@ class LineSegment extends Polygon
     return @points[1]
 
 
+  clone: ->
+    return new LineSegment @getStart(), @getEnd()
+
+
   toString: ->
     return """
     LineSegment :
-      - Point A :
+      - Start :
       #{@getStart().toString()}
-      - Point B :
+      - End :
       #{@getEnd().toString()}
     """
 

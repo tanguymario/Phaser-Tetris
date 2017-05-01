@@ -1,10 +1,29 @@
+GridTheme = require '../grid/grid-theme.coffee'
+
 assert = require '../../utils/assert.coffee'
 
-debug       = require '../utils/debug.coffee'
-debugThemes = require '../utils/debug-themes.coffee'
+debug       = require '../../utils/debug.coffee'
+debugThemes = require '../../utils/debug-themes.coffee'
 
 class Player
-  constructor: ->
+  constructor: (game, gridTheme) ->
+    assert game?, "Game missing"
+    
+    @game = game
+    @theme = gridTheme
 
 
-module.exports = PlayerHuman
+    moveLeft: ->
+      move -1
+
+
+    moveRight: ->
+      move 1
+
+
+    move: (value) ->
+      assert @grid?, "Grid missing"
+      debug 'move: ' + value
+
+
+module.exports = Player

@@ -16,15 +16,17 @@ class Case
   @S_RED = 4
   @S_BLUE = 5
   @S_PURPLE = 6
+  @S_ORANGE = 7
 
-  constructor: (game, grid, gridCoords, spritesheetKey) ->
+  constructor: (game, grid, gridCoords, theme) ->
     assert gridCoords instanceof Coordinates, "GridCoords missing"
 
     @game = game
     @grid = grid
     @coords = gridCoords
+    @theme = theme
 
-    @sprite = @game.add.sprite 0, 0, spritesheetKey, Case.S_NONE
+    @sprite = @game.add.sprite 0, 0, @theme.key, Case.S_NONE
 
 
   getCaseAt: (direction) ->

@@ -5,24 +5,26 @@ Coordinates = require '../coordinates.coffee'
 assert = require '../assert.coffee'
 
 class Square extends Polygon
-  constructor: (topLeft, bottomRight) ->
+  constructor: (topLeft, size) ->
     assert topLeft instanceof Coordinates, "Top Left is not of type Coordinates"
     assert bottomRight instanceof Coordinates, "Bottom Right is not of type Coordinates"
+    assert size >= 0, "size cannot be negative"
 
-    bottomLeft = new Coordinates topLeft.x, bottomRight.y
-    topRight = new Coordinates bottomRight.x, topLeft.y
+    @size = size
 
-    @sideLength = topRight.x - topLeft.x
+    topRight = new Coordinates topLeft.x + @size, topLeft.y
+    bottomLeft = new Coordinates topLeft.x, topLeft.y + @size
+    bottomRight = new Coordinates topRight.x, bottomLeft.y
 
     super topLeft, bottomLeft, bottomRight, topRight
 
 
-  getSideLength: ->
-    return @sideLength
+  getSize: ->
+    return @size
 
 
   getDiagonalLength: ->
-    return @sideLength * Math.sqrt 2
+    return @size * Math.sqrt 2
 
 
   getTopLeft: ->
@@ -41,6 +43,10 @@ class Square extends Polygon
     return @points[2]
 
 
+  clone: ->
+    return new Square @getTopLeft(), @size
+
+
   toString: ->
     return """
     Square :
@@ -52,6 +58,8 @@ class Square extends Polygon
         #{@getTopLeft().toString()}
       - Bottom Right :
         #{@getBottomRight().toString()}
+      - Size :
+        #{@size}
     """
 
 

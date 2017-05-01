@@ -1,5 +1,13 @@
 Phaser = require 'Phaser'
 
+GridConfig = require '../tetris/grid/grid-config.coffee'
+GridTheme = require '../tetris/grid/grid-theme.coffee'
+
+PlayerHuman = require '../tetris/player/player-human.coffee'
+PlayerHumanConfig = require '../tetris/player/player-human-config.coffee'
+
+Tetris = require '../tetris/tetris.coffee'
+
 config      = require '../config/config.coffee'
 
 debug       = require '../utils/debug.coffee'
@@ -14,9 +22,17 @@ class Game extends Phaser.State
   preload: ->
     debug 'Preload...', @, 'info', 30, debugThemes.Phaser
 
+    # TODO
+    @theme = GridTheme.debug
+
+    @game.load.spritesheet @theme.key, @theme.src, @theme.spriteSize.w, @theme.spriteSize.h
+
 
   create: ->
     debug 'Create...', @, 'info', 30, debugThemes.Phaser
+
+    mainPlayer = new PlayerHuman @game, @theme, PlayerHumanConfig.player1
+    tetrisGame = new Tetris @game, GridConfig.classic, mainPlayer
 
 
   toggleFullscreen: ->
