@@ -22,12 +22,4 @@ class PlayerHuman extends Player
     @keys.right.onDown.add @moveRight, @
 
 
-  moveLeft: ->
-    super
-
-
-  moveRight: ->
-    super
-
-
 module.exports = PlayerHuman

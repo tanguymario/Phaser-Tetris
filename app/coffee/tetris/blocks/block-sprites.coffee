@@ -1,0 +1,9 @@
+module.exports =
+  S_NONE: 0
+  S_CYAN: 1
+  S_YELLOW: 2
+  S_GREEN: 3
+  S_RED: 4
+  S_BLUE: 5
+  S_PURPLE: 6
+  S_ORANGE: 7

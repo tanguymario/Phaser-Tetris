@@ -31,6 +31,16 @@ class Tetris
     for i in [0..@players.length - 1] by 1
       player = players[i]
       player.grid = new Grid @game, gameRectangle, gridConfig, player.theme
-      
+
+    @timer = @game.time.events.loop Phaser.Timer.SECOND, @updateTetrisGame, @
+
+
+  updateTetrisGame: ->
+    console.log "update!"
+
+    for player in @players
+      if not player.currentBlock?
+        player.generateBlock()
+
 
 module.exports = Tetris

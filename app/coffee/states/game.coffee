@@ -22,7 +22,7 @@ class Game extends Phaser.State
   preload: ->
     debug 'Preload...', @, 'info', 30, debugThemes.Phaser
 
-    # TODO
+    # TODO - to change
     @theme = GridTheme.debug
 
     @game.load.spritesheet @theme.key, @theme.src, @theme.spriteSize.w, @theme.spriteSize.h
