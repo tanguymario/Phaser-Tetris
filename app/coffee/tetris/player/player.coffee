@@ -3,6 +3,8 @@ GridTheme = require '../grid/grid-theme.coffee'
 Block = require '../blocks/block.coffee'
 BlockType = require '../blocks/block-type.coffee'
 
+Matrix = require '../../utils/math/matrix.coffee'
+
 assert = require '../../utils/assert.coffee'
 
 debug       = require '../../utils/debug.coffee'
@@ -19,9 +21,26 @@ class Player
   generateBlock: ->
     randBlockType = Block.GetRandomBlockType()
 
+    # TODO CORRECT THIS!!
+    mat = [
+      [0, 0, 1, 1, 0, 1],
+      [1, 1, 1, 0, 0, 0],
+      [1, 0, 1, 0, 1, 0],
+      [1, 1, 1, 1, 0, 1],
+      [1, 0, 1, 1, 0, 0],
+      [1, 1, 1, 1, 1, 1]
+    ]
+
+    mat = new Matrix mat
+
+    mat.rotateRight()
+    console.log mat.toString()
+
+    ###
     console.log randBlockType.matrix.toString()
     randBlockType.matrix.rotateRight()
     console.log randBlockType.matrix.toString()
+    ###
 
     @currentBlock = 1
 
