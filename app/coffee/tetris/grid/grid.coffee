@@ -25,9 +25,9 @@ class Grid
 
     # Grid initialisation
     @tab = new Array @config.size.h
-    for i in [0..@config.size.h - 1] by 1
+    for i in [0...@config.size.h] by 1
       @tab[i] = new Array @config.size.w
-      for j in [0..@config.size.w - 1] by 1
+      for j in [0...@config.size.w] by 1
         coords = new Coordinates i, j
         @tab[i][j] = new Case @game, @, coords, @theme
 

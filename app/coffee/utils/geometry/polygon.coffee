@@ -7,7 +7,7 @@ assert = require '../assert.coffee'
 class Polygon
 
   constructor: (coordinates...) ->
-    for i in [0..coordinates.length - 1] by 1
+    for i in [0...coordinates.length] by 1
       assert coordinates[i] instanceof Coordinates, "object specified is not of type \'Coordinates\'"
 
     @points = coordinates
@@ -37,7 +37,7 @@ class Polygon
 
     graphics.beginFill 0xFFFFFF
 
-    for i in [0..@points.length - 1] by 1
+    for i in [0...@points.length] by 1
       nextPoint = @points[(i + 1) % @points.length]
 
       diffPoint = Coordinates.Sub nextPoint, firstPoint

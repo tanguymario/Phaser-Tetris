@@ -28,7 +28,7 @@ class Tetris
     gameRectangle = new Rectangle topLeftGame, @game.width, @game.height
 
     # Grid creation (one player = one grid)
-    for i in [0..@players.length - 1] by 1
+    for i in [0...@players.length] by 1
       player = players[i]
       player.grid = new Grid @game, gameRectangle, gridConfig, player.theme
 
