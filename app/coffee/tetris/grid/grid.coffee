@@ -3,6 +3,7 @@ GridTheme = require './grid-theme.coffee'
 GridLayout = require './grid-layout.coffee'
 
 Case = require './case.coffee'
+CaseSprite = require './case-sprite.coffee'
 
 Coordinates = require '../../utils/coordinates.coffee'
 Rectangle = require '../../utils/geometry/rectangle.coffee'
@@ -24,12 +25,17 @@ class Grid
     @layout = new GridLayout @game, @, rectangleView, @config
 
     # Grid initialisation
-    @tab = new Array @config.size.h
-    for i in [0...@config.size.h] by 1
+    nbLines = @config.size.h + @config.nbHiddenLines
+    @tab = new Array nbLines
+    for i in [0...nbLines] by 1
       @tab[i] = new Array @config.size.w
       for j in [0...@config.size.w] by 1
         coords = new Coordinates i, j
-        @tab[i][j] = new Case @game, @, coords, @theme
+
+        if i >= @config.nbHiddenLines
+          @tab[i][j] = new CaseSprite @game, @, coords, @theme
+        else
+          @tab[i][j] = new Case @game, @, coords, @theme
 
     @layout.updateCasesTransform()
 
@@ -44,14 +50,13 @@ class Grid
 
       gridCoords = new Coordinates column, line
       return @getCaseAtGridCoords gridCoords
-
     return null
 
 
   getCaseAtGridCoords: (coords) ->
     assert coords instanceof Coordinates, "Coords missing"
 
-    if coords.x >= 0 and coords.x < @config.size.h
+    if coords.x >= 0 and coords.x < @config.size.h + @config.nbHiddenLines
       if coords.y >= 0 and coords.y < @config.size.w
         return @tab[coords.x][coords.y]
 

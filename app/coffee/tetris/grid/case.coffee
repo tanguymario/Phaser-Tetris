@@ -2,8 +2,6 @@ Coordinates = require '../../utils/coordinates.coffee'
 
 Direction = require '../../utils/direction.coffee'
 
-BlockSprites = require '../blocks/block-sprites.coffee'
-
 assert = require '../../utils/assert.coffee'
 
 debug       = require '../../utils/debug.coffee'
@@ -18,10 +16,8 @@ class Case
     @coords = gridCoords
     @theme = theme
 
-    @sprite = @game.add.sprite 0, 0, @theme.key, BlockSprites.S_NONE
 
-
-  getCaseAt: (direction) ->
+  getNeighbourAt: (direction) ->
     assert direction instanceof Direction, "direction missing"
 
     neighbourCoords = Coordinates.Add @coords, direction.value

@@ -6,17 +6,17 @@ class Matrix
   @DEFAULT_SIZE = 4
   @NB_BORDERS = 4
 
-  @GetDoubleArrayCopy: (array) ->
+  @GetDoubleArrayCopy: (matrix) ->
     assert Array.isArray matrix
     assert Array.isArray matrix[0]
 
-    height = array.length
+    height = matrix.length
     newArr = new Array height
     for i in [0...height] by 1
-      width = array[i].length
+      width = matrix[i].length
       newArr[i] = new Array width
       for j in [0...width] by 1
-        newArr[i][j] = array[i][j]
+        newArr[i][j] = matrix[i][j]
 
     return newArr
 

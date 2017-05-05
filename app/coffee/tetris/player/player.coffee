@@ -16,42 +16,13 @@ class Player
 
     @game = game
     @theme = gridTheme
+    @currentBlock = null
 
 
   generateBlock: ->
     randBlockType = Block.GetRandomBlockType()
-
-    mat = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ]
-
-    mat = new Matrix mat
-
-    console.log "start"
-
-    mat.rotateBack()
-
-    console.log mat.toString()
-
-    ###
-    console.log randBlockType.matrix.toString()
-    randBlockType.matrix.rotateRight()
-    console.log randBlockType.matrix.toString()
-    ###
-
-    @currentBlock = 1
+    @currentBlock = new Block @game, @grid, randBlockType
+    
 
 
   moveLeft: ->
@@ -63,7 +34,9 @@ class Player
 
 
   move: (value) ->
-    assert @grid?, "Grid missing"
+    if not @currentBlock?
+      return
+
     debug 'move: ' + value
 
 

@@ -1,6 +1,8 @@
 Coordinates = require '../../utils/coordinates.coffee'
 Rectangle = require '../../utils/geometry/rectangle.coffee'
 
+CaseSprite = require './case-sprite.coffee'
+
 assert = require '../../utils/assert.coffee'
 
 debug       = require '../../utils/debug.coffee'
@@ -48,7 +50,7 @@ class GridLayout
 
 
   updateCasesTransform: ->
-    for i in [0...@config.size.h] by 1
+    for i in [@config.nbHiddenLines...@config.size.h + @config.nbHiddenLines] by 1
       for j in [0...@config.size.w] by 1
         coords = new Coordinates i, j
         currentCase = @grid.getCaseAtGridCoords coords
@@ -56,7 +58,7 @@ class GridLayout
         # Position
         coords = @view.getTopLeft().clone()
         coords.x += j * @caseSize
-        coords.y += i * @caseSize
+        coords.y += (i - @config.nbHiddenLines) * @caseSize
         currentCase.sprite.x = coords.x
         currentCase.sprite.y = coords.y
 
