@@ -13,11 +13,12 @@ class PlayerHuman extends Player
     @config = playerConfig
 
     @keys =
-      left: @game.input.keyboard.addKey @config.left, @
-      right: @game.input.keyboard.addKey @config.right, @
-      finish: @game.input.keyboard.addKey @config.finish, @
-      accelerate: @game.input.keyboard.addKey @config.accelerate, @
+      left: @game.input.keyboard.addKey @config.keys.left, @
+      right: @game.input.keyboard.addKey @config.keys.right, @
+      finish: @game.input.keyboard.addKey @config.keys.finish, @
+      accelerate: @game.input.keyboard.addKey @config.keys.accelerate, @
 
+    @game.input.keyboard.addKey @config.left, @
     @keys.left.onDown.add @moveLeft, @
     @keys.right.onDown.add @moveRight, @
 

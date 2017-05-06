@@ -3,8 +3,8 @@ Matrix = require '../../utils/math/matrix.coffee'
 
 I = [
   [0, 0, 0, 0],
-  [1, 1, 1, 1],
   [0, 0, 0, 0],
+  [1, 1, 1, 1],
   [0, 0, 0, 0]
 ]
 
@@ -65,7 +65,7 @@ module.exports = [
   {
     name: "L"
     matrix: new Matrix L
-    spriteFrame: BlockSprites.S_CYAN
+    spriteFrame: BlockSprites.S_ORANGE
     nbRotations: 3
   },
   {

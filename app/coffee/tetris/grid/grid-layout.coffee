@@ -50,15 +50,16 @@ class GridLayout
 
 
   updateCasesTransform: ->
-    for i in [@config.nbHiddenLines...@config.size.h + @config.nbHiddenLines] by 1
-      for j in [0...@config.size.w] by 1
+    totalHeight = @config.size.h + @config.nbHiddenLines
+    for i in [0...@config.size.w] by 1
+      for j in [@config.nbHiddenLines...totalHeight] by 1
         coords = new Coordinates i, j
         currentCase = @grid.getCaseAtGridCoords coords
 
         # Position
         coords = @view.getTopLeft().clone()
-        coords.x += j * @caseSize
-        coords.y += (i - @config.nbHiddenLines) * @caseSize
+        coords.x += i * @caseSize
+        coords.y += (j - @config.nbHiddenLines) * @caseSize
         currentCase.sprite.x = coords.x
         currentCase.sprite.y = coords.y
 

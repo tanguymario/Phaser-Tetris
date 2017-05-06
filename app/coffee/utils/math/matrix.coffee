@@ -7,8 +7,8 @@ class Matrix
   @NB_BORDERS = 4
 
   @GetDoubleArrayCopy: (tab) ->
-    assert Array.isArray tab
-    assert Array.isArray tab[0]
+    assert Array.isArray tab, "Tab not an array"
+    assert Array.isArray tab[0], "Tab not a double array"
 
     height = tab.length
     newArr = new Array tab
@@ -70,9 +70,9 @@ class Matrix
 
 
   getAt: (i, j) ->
-    assert i >= 0 and i < @height, "Line out of bounds"
-    assert j >= 0 and j < @width, "Column out of bounds"
-    return @tab[i][j]
+    assert i >= 0 and i < @width, "Column out of bounds"
+    assert j >= 0 and j < @height, "Line out of bounds"
+    return @tab[j][i]
 
 
   getTransposition: ->
@@ -85,7 +85,7 @@ class Matrix
     if @width == @height
       for i in [1...@height] by 1
         for j in [0...i] by 1
-          temp = @tabi][j]
+          temp = @tab[i][j]
           @tab[i][j] = @tab[j][i]
           @tab[j][i] = temp
     else
@@ -207,7 +207,7 @@ class Matrix
 
 
   clone: ->
-    cloneMatrix = Matrix.GetDoubleArrayCopy @matrix
+    cloneMatrix = Matrix.GetDoubleArrayCopy @tab
     return new Matrix cloneMatrix
 
 

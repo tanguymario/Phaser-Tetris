@@ -3,6 +3,8 @@ GridTheme = require '../grid/grid-theme.coffee'
 Block = require '../blocks/block.coffee'
 BlockType = require '../blocks/block-type.coffee'
 
+Direction = require '../../utils/direction.coffee'
+
 Matrix = require '../../utils/math/matrix.coffee'
 
 assert = require '../../utils/assert.coffee'
@@ -22,21 +24,20 @@ class Player
   generateBlock: ->
     randBlockType = Block.GetRandomBlockType()
     @currentBlock = new Block @game, @grid, randBlockType
-    
+
 
   moveLeft: ->
-    move -1
+    @move Direction.W
 
 
   moveRight: ->
-    move 1
+    @move Direction.E
 
 
-  move: (value) ->
+  move: (direction) ->
     if not @currentBlock?
       return
 
-    debug 'move: ' + value
-
+    @currentBlock.move direction
 
 module.exports = Player

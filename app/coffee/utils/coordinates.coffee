@@ -57,6 +57,11 @@ class Coordinates
     return new Coordinates 1, 1
 
 
+  @Inverse: (coords) ->
+    assert coords instanceof Coordinates
+    return new Coordinates -coords.x, -coords.y
+
+
   constructor: (x, y) ->
     @x = x
     @y = y

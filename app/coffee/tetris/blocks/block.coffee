@@ -1,6 +1,9 @@
 Coordinates = require '../../utils/coordinates.coffee'
 
+BlockSprites = require './block-sprites.coffee'
 BlockType = require './block-type.coffee'
+
+Direction = require '../../utils/direction.coffee'
 
 Case = require '../grid/case.coffee'
 CaseSprite = require '../grid/case-sprite.coffee'
@@ -11,7 +14,6 @@ debug       = require '../../utils/debug.coffee'
 debugThemes = require '../../utils/debug-themes.coffee'
 
 class Block
-
   @GetRandomBlockType: ->
     randIndex = Math.floor(Math.random() * (BlockType.length - 1))
     return BlockType[randIndex]
@@ -47,6 +49,9 @@ class Block
 
     @topLeftCase = @grid.getCaseAtGridCoords topLeftCaseCoords
 
+    console.log topLeftCaseCoords
+    console.log @topLeftCase.coords
+
     @spawn()
 
 
@@ -61,10 +66,11 @@ class Block
 
   draw: ->
     currentMatrix = @getCurrentMatrix()
-    for i in [0...currentMatrix.height] by 1
-      for j in [0...currentMatrix.width] by 1
-        if currentMatrix[i][j] == 1
-          caseCoords = Coordinates.Add @topLeftCase.coords, new Coordinates(j, i)
+    for i in [0...currentMatrix.width] by 1
+      for j in [0...currentMatrix.height] by 1
+        matrixValue = currentMatrix.getAt i, j
+        if matrixValue == 1
+          caseCoords = Coordinates.Add @topLeftCase.coords, new Coordinates(i, j)
           currentCase = @grid.getCaseAtGridCoords caseCoords
 
           assert currentCase?, "Block draw : currentCase null"
@@ -73,7 +79,21 @@ class Block
             currentCase.sprite.frame = @type.spriteFrame
 
 
-  checkBlockIntegrity: (matrix, topLeftCase) ->
+  checkBlockIntegrity: ->
+    if not @topLeftCase?
+      return false
+
+    currentMatrix = @getCurrentMatrix()
+    for i in [0...currentMatrix.width] by 1
+      for j in [0...currentMatrix.height] by 1
+        matrixValue = currentMatrix.getAt i, j
+        if matrixValue == 1
+          coords = new Coordinates i, j
+          coords = Coordinates.Add @topLeftCase.coords, coords
+          currentCase = @grid.getCaseAtGridCoords coords
+          if not currentCase? or currentCase.containsBlock
+            return false
+
     return true
 
 
@@ -86,6 +106,40 @@ class Block
       @rotateRight true
 
 
+  cleanFromCase: (currCase) ->
+    assert currCase?, "Clean case : case null"
+
+    currentMatrix = @getCurrentMatrix()
+    for i in [0...currentMatrix.width] by 1
+      for j in [0...currentMatrix.height] by 1
+        matrixValue = currentMatrix.getAt i, j
+        if matrixValue == 1
+          caseCoords = Coordinates.Add currCase.coords, new Coordinates(i, j)
+          currentCase = @grid.getCaseAtGridCoords caseCoords
+
+          assert currentCase?, "Block clean : currentCase null"
+
+          if currentCase instanceof CaseSprite
+            currentCase.sprite.frame = BlockSprites.S_NONE
+
+
+  move: (direction) ->
+    assert @topLeftCase?, "Top Left Case null"
+
+    directionCoords = direction.value.clone()
+    directionCoords.y = -directionCoords.y
+
+    newCoords = Coordinates.Add @topLeftCase.coords, directionCoords
+    oldCase = @grid.getCaseAtGridCoords @topLeftCase.coords
+    @topLeftCase = @grid.getCaseAtGridCoords newCoords
+
+    if not @checkBlockIntegrity()
+      @topLeftCase = oldCase
+    else
+      @cleanFromCase oldCase
+      @draw()
+
+
   rotateRight: (force = false) ->
     @currentMatrixIndex += 1
     @currentMatrixIndex %= @matrixs.length
@@ -94,7 +148,7 @@ class Block
 
 
   update: ->
-
+    @move Direction.S
 
 
 

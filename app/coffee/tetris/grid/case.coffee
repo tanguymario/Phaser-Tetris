@@ -15,6 +15,7 @@ class Case
     @grid = grid
     @coords = gridCoords
     @theme = theme
+    @containsBlock = false
 
 
   getNeighbourAt: (direction) ->

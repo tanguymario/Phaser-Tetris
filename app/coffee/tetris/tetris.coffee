@@ -41,6 +41,8 @@ class Tetris
     for player in @players
       if not player.currentBlock?
         player.generateBlock()
+      else
+        player.currentBlock.update()
 
 
 module.exports = Tetris

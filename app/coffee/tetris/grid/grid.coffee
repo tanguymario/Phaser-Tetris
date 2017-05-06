@@ -8,6 +8,8 @@ CaseSprite = require './case-sprite.coffee'
 Coordinates = require '../../utils/coordinates.coffee'
 Rectangle = require '../../utils/geometry/rectangle.coffee'
 
+Matrix = require '../../utils/math/matrix.coffee'
+
 assert = require '../../utils/assert.coffee'
 
 debug       = require '../../utils/debug.coffee'
@@ -26,16 +28,18 @@ class Grid
 
     # Grid initialisation
     nbLines = @config.size.h + @config.nbHiddenLines
-    @tab = new Array nbLines
+    tab = new Array nbLines
     for i in [0...nbLines] by 1
-      @tab[i] = new Array @config.size.w
+      tab[i] = new Array @config.size.w
       for j in [0...@config.size.w] by 1
-        coords = new Coordinates i, j
+        coords = new Coordinates j, i
 
         if i >= @config.nbHiddenLines
-          @tab[i][j] = new CaseSprite @game, @, coords, @theme
+          tab[i][j] = new CaseSprite @game, @, coords, @theme
         else
-          @tab[i][j] = new Case @game, @, coords, @theme
+          tab[i][j] = new Case @game, @, coords, @theme
+
+    @matrix = new Matrix tab
 
     @layout.updateCasesTransform()
 
@@ -56,9 +60,9 @@ class Grid
   getCaseAtGridCoords: (coords) ->
     assert coords instanceof Coordinates, "Coords missing"
 
-    if coords.x >= 0 and coords.x < @config.size.h + @config.nbHiddenLines
-      if coords.y >= 0 and coords.y < @config.size.w
-        return @tab[coords.x][coords.y]
+    if coords.x >= 0 and coords.x < @matrix.width
+      if coords.y >= 0 and coords.y < @matrix.height
+        return @matrix.getAt coords.x, coords.y
 
     debug 'getCaseAtGridCoords: coords out of bounds', @, 'warning', 250, debugThemes.Grid, coords
     return null
