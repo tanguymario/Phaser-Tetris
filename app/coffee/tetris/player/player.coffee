@@ -24,7 +24,6 @@ class Player
     @currentBlock = new Block @game, @grid, randBlockType
     
 
-
   moveLeft: ->
     move -1
 

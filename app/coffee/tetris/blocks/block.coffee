@@ -52,13 +52,10 @@ class Block
 
   getCurrentMatrix: ->
     assert @matrixs[@currentMatrixIndex]?, "Current Matrix is null in @matrixs"
-    assert @matrixs[@currentMatrixIndex].matrix?, "Current matrix object is null"
-
-    return @matrixs[@currentMatrixIndex].matrix
+    return @matrixs[@currentMatrixIndex]
 
 
   spawn: ->
-    assert @topLeftCase instanceof Case, "Block Spawn: Not a case"
     @draw()
 
 

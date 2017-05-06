@@ -6,17 +6,17 @@ class Matrix
   @DEFAULT_SIZE = 4
   @NB_BORDERS = 4
 
-  @GetDoubleArrayCopy: (matrix) ->
-    assert Array.isArray matrix
-    assert Array.isArray matrix[0]
+  @GetDoubleArrayCopy: (tab) ->
+    assert Array.isArray tab
+    assert Array.isArray tab[0]
 
-    height = matrix.length
-    newArr = new Array height
+    height = tab.length
+    newArr = new Array tab
     for i in [0...height] by 1
-      width = matrix[i].length
+      width = tab[i].length
       newArr[i] = new Array width
       for j in [0...width] by 1
-        newArr[i][j] = matrix[i][j]
+        newArr[i][j] = tab[i][j]
 
     return newArr
 
@@ -39,7 +39,7 @@ class Matrix
     for i in [0...matA.height.length] by 1
       result[i] = new Array matA.width
       for j in [0...matA.width] by 1
-        result[i][j] = matA[i][j] + matB[i][j]
+        result[i][j] = matA.tab[i][j] + matB.tab[i][j]
 
     return new Matrix result
 
@@ -51,27 +51,28 @@ class Matrix
     # TODO
     throw "Not Implemented"
 
-  constructor: (matrix, copy = false) ->
-    assert Array.isArray matrix
-    assert matrix.length >= 0, "Array size cannot be negative"
-    assert matrix[0].length >= 0, "Double array size cannot be negative"
 
-    @height = matrix.length
-    @width = matrix[0].length
+  constructor: (tab, copy = false) ->
+    assert Array.isArray tab
+    assert tab.length >= 0, "Array size cannot be negative"
+    assert tab[0].length >= 0, "Double array size cannot be negative"
+
+    @height = tab.length
+    @width = tab[0].length
 
     for i in [0...@height] by 1
-      assert matrix[i].length == @width, "Matrix width differences found!"
+      assert tab[i].length == @width, "Matrix width differences found!"
 
     if copy
-      @matrix = Matrix.GetDoubleArrayCopy matrix
+      @tab = Matrix.GetDoubleArrayCopy tab
     else
-      @matrix = matrix
+      @tab = tab
 
 
   getAt: (i, j) ->
     assert i >= 0 and i < @height, "Line out of bounds"
     assert j >= 0 and j < @width, "Column out of bounds"
-    return @matrix[i][j]
+    return @tab[i][j]
 
 
   getTransposition: ->
@@ -84,15 +85,15 @@ class Matrix
     if @width == @height
       for i in [1...@height] by 1
         for j in [0...i] by 1
-          temp = @matrix[i][j]
-          @matrix[i][j] = @matrix[j][i]
-          @matrix[j][i] = temp
+          temp = @tabi][j]
+          @tab[i][j] = @tab[j][i]
+          @tab[j][i] = temp
     else
       newMatrix = new Array @width
       for i in [0...@width] by 1
         newMatrix[i] = new Array @height
         for j in [0...@height] by 1
-          newMatrix[i][j] = @matrix[j][i]
+          newMatrix[i][j] = @tab[j][i]
 
       @matrix = newMatrix
       @height = newMatrix.length
@@ -131,16 +132,16 @@ class Matrix
         incrementalDepth = i + depth
 
         # Get cell values
-        firstCell = @matrix[depth][incrementalDepth]
-        secondCell = @matrix[incrementalDepth][nbCasesToDoDepth]
-        thirdCell = @matrix[nbCasesToDoDepth][nbCasesLeftDepth]
-        fourthCell = @matrix[nbCasesLeftDepth][depth]
+        firstCell = @tab[depth][incrementalDepth]
+        secondCell = @tab[incrementalDepth][nbCasesToDoDepth]
+        thirdCell = @tab[nbCasesToDoDepth][nbCasesLeftDepth]
+        fourthCell = @tab[nbCasesLeftDepth][depth]
 
         # Swap values
-        @matrix[incrementalDepth][nbCasesToDoDepth] = firstCell
-        @matrix[nbCasesToDoDepth][nbCasesLeftDepth] = secondCell
-        @matrix[nbCasesLeftDepth][depth] = thirdCell
-        @matrix[depth][incrementalDepth] = fourthCell
+        @tab[incrementalDepth][nbCasesToDoDepth] = firstCell
+        @tab[nbCasesToDoDepth][nbCasesLeftDepth] = secondCell
+        @tab[nbCasesLeftDepth][depth] = thirdCell
+        @tab[depth][incrementalDepth] = fourthCell
 
 
   rotateLeft: ->
@@ -155,16 +156,16 @@ class Matrix
         incrementalDepth = i + depth
 
         # Get cell values
-        firstCell = @matrix[depth][incrementalDepth]
-        secondCell = @matrix[nbCasesLeftDepth][depth]
-        thirdCell = @matrix[nbCasesToDoDepth][nbCasesLeftDepth]
-        fourthCell = @matrix[incrementalDepth][nbCasesToDoDepth]
+        firstCell = @tab[depth][incrementalDepth]
+        secondCell = @tab[nbCasesLeftDepth][depth]
+        thirdCell = @tab[nbCasesToDoDepth][nbCasesLeftDepth]
+        fourthCell = @tab[incrementalDepth][nbCasesToDoDepth]
 
         # Swap values
-        @matrix[nbCasesLeftDepth][depth] = firstCell
-        @matrix[nbCasesToDoDepth][nbCasesLeftDepth] = secondCell
-        @matrix[incrementalDepth][nbCasesToDoDepth] = thirdCell
-        @matrix[depth][incrementalDepth] = fourthCell
+        @tab[nbCasesLeftDepth][depth] = firstCell
+        @tab[nbCasesToDoDepth][nbCasesLeftDepth] = secondCell
+        @tab[incrementalDepth][nbCasesToDoDepth] = thirdCell
+        @tab[depth][incrementalDepth] = fourthCell
 
 
   # TODO
@@ -177,9 +178,9 @@ class Matrix
         rightColumn = @width - 1 - j
 
         # Swap
-        temp = @matrix[i][j]
-        @matrix[i][j] = @matrix[bottomLine][rightColumn]
-        @matrix[bottomLine][rightColumn] = temp
+        temp = @tab[i][j]
+        @tab[i][j] = @tab[bottomLine][rightColumn]
+        @tab[bottomLine][rightColumn] = temp
 
 
   flipHorizontally: ->
@@ -189,9 +190,9 @@ class Matrix
         rightColumn = @width - 1 - j
 
         # Swap values
-        temp = @matrix[i][j]
-        @matrix[i][j] = @matrix[i][rightColumn]
-        @matrix[i][rightColumn] = temp
+        temp = @tab[i][j]
+        @tab[i][j] = @tab[i][rightColumn]
+        @tab[i][rightColumn] = temp
 
 
   flipVertically: ->
@@ -200,9 +201,9 @@ class Matrix
       bottomLine = @height - 1 - i
       for j in [0...@height] by 1
         # Swap values
-        temp = @matrix[i][j]
-        @matrix[i][j] = @matrix[bottomLine][j]
-        @matrix[bottomLine][j] = temp
+        temp = @tab[i][j]
+        @tab[i][j] = @tab[bottomLine][j]
+        @tab[bottomLine][j] = temp
 
 
   clone: ->
@@ -215,14 +216,14 @@ class Matrix
     Matrix :
       - width: #{@width}
       - height: #{@height}
-      - matrix:
+      - tab:
     #{
-    matrixString = ""
+    tabString = ""
     for i in [0...@height] by 1
       for j in [0...@width] by 1
-        matrixString += @matrix[i][j].toString() + " "
-      matrixString += "\n"
-    matrixString
+        tabString += @tab[i][j].toString() + " "
+      tabString += "\n"
+    tabString
     }
     """
 
