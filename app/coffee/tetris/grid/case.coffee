@@ -2,6 +2,8 @@ Coordinates = require '../../utils/coordinates.coffee'
 
 Direction = require '../../utils/direction.coffee'
 
+BlockSprites = require '../blocks/block-sprites.coffee'
+
 assert = require '../../utils/assert.coffee'
 
 debug       = require '../../utils/debug.coffee'
@@ -23,6 +25,15 @@ class Case
 
     neighbourCoords = Coordinates.Add @coords, direction.value
     return @grid.getCaseAtGridCoords neighbourCoords
+
+
+  reset: ->
+    @containsBlock = false
+
+
+  setFrame: (frame) ->
+    assert frame in BlockSprites, "Frame not found"
+
 
 
 module.exports = Case

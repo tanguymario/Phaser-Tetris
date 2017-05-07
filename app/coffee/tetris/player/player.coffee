@@ -26,6 +26,18 @@ class Player
     @currentBlock = new Block @game, @grid, randBlockType
 
 
+  rotateLeft: ->
+    @rotate Direction.W
+
+
+  rotateRight: ->
+    @rotate Direction.E
+
+
+  rotate: (direction) ->
+    @currentBlock.rotate direction
+
+
   moveLeft: ->
     @move Direction.W
 

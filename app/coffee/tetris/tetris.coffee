@@ -32,14 +32,12 @@ class Tetris
       player = players[i]
       player.grid = new Grid @game, gameRectangle, gridConfig, player.theme
 
-    @timer = @game.time.events.loop Phaser.Timer.SECOND, @updateTetrisGame, @
+    @timer = @game.time.events.loop 200, @updateTetrisGame, @
 
 
   updateTetrisGame: ->
-    console.log "update!"
-
     for player in @players
-      if not player.currentBlock?
+      if not player.currentBlock? or player.currentBlock.fixed
         player.generateBlock()
       else
         player.currentBlock.update()

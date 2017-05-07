@@ -1,6 +1,9 @@
 BlockSprites = require './block-sprites.coffee'
 Matrix = require '../../utils/math/matrix.coffee'
 
+MIN_ROTATIONS = 0
+MAX_ROTATIONS = 4
+
 I = [
   [0, 0, 0, 0],
   [0, 0, 0, 0],
@@ -14,9 +17,9 @@ O = [
 ]
 
 T = [
+  [0, 0, 0],
   [1, 1, 1],
-  [0, 1, 0],
-  [0, 0, 0]
+  [0, 1, 0]
 ]
 
 L = [
@@ -41,6 +44,12 @@ S = [
   [0, 0, 0],
   [0, 1, 1],
   [1, 1, 0],
+]
+
+Q = [
+  [0, 0, 0],
+  [1, 1, 1],
+  [1, 0, 1]
 ]
 
 module.exports = [
@@ -83,7 +92,13 @@ module.exports = [
   {
     name: "S"
     matrix: new Matrix S
-    spriteFrame: BlockSprites.S_CYAN
+    spriteFrame: BlockSprites.S_GREEN
     nbRotations: 1
+  },
+  {
+    name: "Q"
+    matrix: new Matrix Q
+    spriteFrame: BlockSprites.S_GREEN
+    nbRotations: 3
   }
 ]

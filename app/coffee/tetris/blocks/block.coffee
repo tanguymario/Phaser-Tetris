@@ -15,7 +15,7 @@ debugThemes = require '../../utils/debug-themes.coffee'
 
 class Block
   @GetRandomBlockType: ->
-    randIndex = Math.floor(Math.random() * (BlockType.length - 1))
+    randIndex = Math.floor(Math.random() * (BlockType.length))
     return BlockType[randIndex]
 
 
@@ -25,39 +25,81 @@ class Block
     @type = type
     @spritesheetKey = spritesheetKey
 
-    # Matrix creation
-    nbTotalMatrix = 1 + @type.nbRotations
+    @fixed = false
 
-    assert nbTotalMatrix >= 1 and nbTotalMatrix <= 4, "Nb Matrix not consistent"
-
-    @matrixs = new Array nbTotalMatrix
+    # Create rotation matrixs
+    nbTotalMatrixs = 1 + @type.nbRotations
+    assert nbTotalMatrixs >= 1 and nbTotalMatrixs <= 4, "Nb Matrix not consistent"
+    @matrixs = new Array nbTotalMatrixs
     @matrixs[0] = @type.matrix
-
-    for i in [1...nbTotalMatrix] by 1
+    for i in [1...nbTotalMatrixs] by 1
       @matrixs[i] = @matrixs[i - 1].clone()
       @matrixs[i].rotateRight()
 
-    @currentMatrixIndex = 0
+    # Create rotation matrix offsets
+    @matrixsOffsets = new Array nbTotalMatrixs
+    for i in [0...nbTotalMatrixs] by 1
+      @matrixsOffsets[i] = new Coordinates 0, 0
+      matrix = @matrixs[i]
 
-    # @blockSprites = @game.add.group()
+      # Offset x
+      for j in [0...matrix.width] by 1
+        columnEmpty = true
+        for k in [0...matrix.height] by 1
+          matrixValue = matrix.getAt j, k
+          if matrixValue == 1
+            columnEmpty = false
+            break
+        if columnEmpty
+          @matrixsOffsets[i].x += 1
+        else
+          break
 
+      # Offset y
+      for j in [0...matrix.height] by 1
+        lineEmty = true
+        for k in [0...matrix.width] by 1
+          matrixValue = matrix.getAt k, j
+          if matrixValue == 1
+            lineEmty = false
+            break
+        if lineEmty
+          @matrixsOffsets[i].y += 1
+        else
+          break
+    
+    # First matrix used
+    @updateRotationMatrix 0
+
+    # Get the spawn case
     halfGridWidth = Math.floor(@grid.config.size.w / 2)
-    halfBlockWidth = Math.floor(@getCurrentMatrix().width / 2)
+    halfBlockWidth = Math.floor(@currentMatrix.width / 2)
     topLeftCaseX = halfGridWidth - halfBlockWidth
     topLeftCaseY = 0
     topLeftCaseCoords = new Coordinates topLeftCaseX, topLeftCaseY
 
-    @topLeftCase = @grid.getCaseAtGridCoords topLeftCaseCoords
 
-    console.log topLeftCaseCoords
-    console.log @topLeftCase.coords
+    topLeftCaseCoords = Coordinates.Add topLeftCaseCoords, @currentMatrixOffset
+
+    # Top left case according to matrixsOffsets
+    @topLeftCase = @grid.getCaseAtGridCoords topLeftCaseCoords
 
     @spawn()
 
 
-  getCurrentMatrix: ->
-    assert @matrixs[@currentMatrixIndex]?, "Current Matrix is null in @matrixs"
-    return @matrixs[@currentMatrixIndex]
+  updateRotationMatrix: (matrixIndex) ->
+    assert matrixIndex >= 0 and matrixIndex < @matrixs.length, "Out of bounds"
+    oldIndex = @currentMatrixIndex
+    @currentMatrixIndex = matrixIndex
+    @currentMatrix = @matrixs[@currentMatrixIndex]
+    @currentMatrixOffset = @matrixsOffsets[@currentMatrixIndex]
+
+    if @topLeftCase?
+      oldMatrixOffset = @matrixsOffsets[oldIndex]
+      if not @currentMatrixOffset.equals oldMatrixOffset
+        newCoords = Coordinates.Sub @topLeftCase.coords, oldMatrixOffset
+        newCoords = Coordinates.Add newCoords, @currentMatrixOffset
+        @topLeftCase = @grid.getCaseAtGridCoords newCoords
 
 
   spawn: ->
@@ -65,15 +107,15 @@ class Block
 
 
   draw: ->
-    currentMatrix = @getCurrentMatrix()
-    for i in [0...currentMatrix.width] by 1
-      for j in [0...currentMatrix.height] by 1
-        matrixValue = currentMatrix.getAt i, j
+    for i in [@currentMatrixOffset.x...@currentMatrix.width] by 1
+      for j in [@currentMatrixOffset.y...@currentMatrix.height] by 1
+        matrixValue = @currentMatrix.getAt i, j
         if matrixValue == 1
-          caseCoords = Coordinates.Add @topLeftCase.coords, new Coordinates(i, j)
-          currentCase = @grid.getCaseAtGridCoords caseCoords
+          coords = new Coordinates i, j
+          currentCase = @getCaseFromMatrix coords
 
-          assert currentCase?, "Block draw : currentCase null"
+          if not currentCase?
+            continue
 
           if currentCase instanceof CaseSprite
             currentCase.sprite.frame = @type.spriteFrame
@@ -83,44 +125,74 @@ class Block
     if not @topLeftCase?
       return false
 
-    currentMatrix = @getCurrentMatrix()
-    for i in [0...currentMatrix.width] by 1
-      for j in [0...currentMatrix.height] by 1
-        matrixValue = currentMatrix.getAt i, j
+    for i in [@currentMatrixOffset.x...@currentMatrix.width] by 1
+      for j in [@currentMatrixOffset.y...@currentMatrix.height] by 1
+        matrixValue = @currentMatrix.getAt i, j
         if matrixValue == 1
-          coords = new Coordinates i, j
-          coords = Coordinates.Add @topLeftCase.coords, coords
-          currentCase = @grid.getCaseAtGridCoords coords
+          matrixCoords = new Coordinates i, j
+          currentCase = @getCaseFromMatrix matrixCoords
           if not currentCase? or currentCase.containsBlock
             return false
 
     return true
 
 
-  rotateLeft: (force = false) ->
-    @currentMatrixIndex -= 1
-    if @currentMatrixIndex < 0
-      @currentMatrixIndex += @matrixs.length
+  getCaseFromMatrix: (matrixCoords, matrixIndex = null, topLeftCase = null) ->
+    assert matrixCoords instanceof Coordinates, "No coords"
 
-    if not force and not @checkBlockIntegrity()
-      @rotateRight true
+    if not matrixIndex?
+      matrixIndex = @currentMatrixIndex
+
+    if not topLeftCase?
+      topLeftCase = @topLeftCase
+
+    coords = Coordinates.Add topLeftCase.coords, matrixCoords
+    coords = Coordinates.Sub coords, @matrixsOffsets[matrixIndex]
+    return @grid.getCaseAtGridCoords coords
 
 
-  cleanFromCase: (currCase) ->
-    assert currCase?, "Clean case : case null"
+  cleanFromCase: (cleanCase, matrixIndex = null) ->
+    assert cleanCase?, "Clean case : case null"
 
-    currentMatrix = @getCurrentMatrix()
-    for i in [0...currentMatrix.width] by 1
-      for j in [0...currentMatrix.height] by 1
-        matrixValue = currentMatrix.getAt i, j
+    if not matrixIndex?
+      matrixIndex = @currentMatrixIndex
+
+    matrix = @matrixs[matrixIndex]
+    matrixOffset = @matrixsOffsets[matrixIndex]
+    for i in [matrixOffset.x...matrix.width] by 1
+      for j in [matrixOffset.y...matrix.height] by 1
+        matrixValue = matrix.getAt i, j
         if matrixValue == 1
-          caseCoords = Coordinates.Add currCase.coords, new Coordinates(i, j)
-          currentCase = @grid.getCaseAtGridCoords caseCoords
+          coords = new Coordinates i, j
+          currentCase = @getCaseFromMatrix coords, matrixIndex, cleanCase
 
           assert currentCase?, "Block clean : currentCase null"
 
           if currentCase instanceof CaseSprite
             currentCase.sprite.frame = BlockSprites.S_NONE
+
+
+  rotate: (direction) ->
+    oldMatrixIndex = @currentMatrixIndex
+    newMatrixIndex = @currentMatrixIndex + direction.value.x
+    if newMatrixIndex < 0
+      newMatrixIndex += @matrixs.length
+    else
+      newMatrixIndex %= @matrixs.length
+
+    oldCase = @topLeftCase
+    @updateRotationMatrix newMatrixIndex
+
+    if not @checkBlockIntegrity()
+      @updateRotationMatrix oldMatrixIndex
+
+      # Top Left Case may be null after the rotation
+      @topLeftCase = oldCase
+      return false
+    else
+      @cleanFromCase oldCase, oldMatrixIndex
+      @draw()
+      return true
 
 
   move: (direction) ->
@@ -135,21 +207,37 @@ class Block
 
     if not @checkBlockIntegrity()
       @topLeftCase = oldCase
+      return false
     else
-      @cleanFromCase oldCase
+      @cleanFromCase oldCase, @currentMatrixIndex
       @draw()
+      return true
 
 
-  rotateRight: (force = false) ->
-    @currentMatrixIndex += 1
-    @currentMatrixIndex %= @matrixs.length
-    if not force and not @checkBlockIntegrity()
-      @rotateLeft true
+  triggerEnd: ->
+    @fixed = true
+
+    # Inform cases of the new static block
+    for i in [@currentMatrixOffset.x...@currentMatrix.width] by 1
+      for j in [@currentMatrixOffset.y...@currentMatrix.height] by 1
+        matrixValue = @currentMatrix.getAt i, j
+        if matrixValue == 1
+          coords = new Coordinates i, j
+          currentCase = @getCaseFromMatrix coords
+
+          assert currentCase?, "Trigger end: case null"
+
+          currentCase.containsBlock = true
+
+    @grid.removeCompleteLines(@)
 
 
   update: ->
-    @move Direction.S
+    if @fixed
+      return
 
+    if not @move Direction.S
+      @triggerEnd()
 
 
 module.exports = Block

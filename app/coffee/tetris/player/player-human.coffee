@@ -13,14 +13,17 @@ class PlayerHuman extends Player
     @config = playerConfig
 
     @keys =
-      left: @game.input.keyboard.addKey @config.keys.left, @
-      right: @game.input.keyboard.addKey @config.keys.right, @
+      moveLeft: @game.input.keyboard.addKey @config.keys.moveLeft, @
+      moveRight: @game.input.keyboard.addKey @config.keys.moveRight, @
+      rotateLeft: @game.input.keyboard.addKey @config.keys.rotateLeft, @
+      rotateRight: @game.input.keyboard.addKey @config.keys.rotateRight, @
       finish: @game.input.keyboard.addKey @config.keys.finish, @
       accelerate: @game.input.keyboard.addKey @config.keys.accelerate, @
 
-    @game.input.keyboard.addKey @config.left, @
-    @keys.left.onDown.add @moveLeft, @
-    @keys.right.onDown.add @moveRight, @
+    @keys.moveLeft.onDown.add @moveLeft, @
+    @keys.moveRight.onDown.add @moveRight, @
+    @keys.rotateLeft.onDown.add @rotateLeft, @
+    @keys.rotateRight.onDown.add @rotateRight, @
 
 
 module.exports = PlayerHuman

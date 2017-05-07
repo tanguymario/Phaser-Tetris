@@ -13,4 +13,14 @@ class CaseSprite extends Case
     @sprite = @game.add.sprite 0, 0, @theme.key, BlockSprites.S_NONE
 
 
+  reset: ->
+    super
+    @sprite.frame = BlockSprites.S_NONE
+
+
+  setFrame: (frame) ->
+    super frame
+    @sprite.frame = frame
+
+
 module.exports = CaseSprite
