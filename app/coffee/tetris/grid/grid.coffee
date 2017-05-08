@@ -26,7 +26,7 @@ class Grid
 
     @layout = new GridLayout @game, @, rectangleView, @config
 
-    # Grid initialisation
+    # Grid initialization
     nbLines = @config.size.h + @config.nbHiddenLines
     tab = new Array nbLines
     for i in [0...nbLines] by 1
@@ -151,5 +151,6 @@ class Grid
 
     debug 'getCaseAtGridCoords: coords out of bounds', @, 'warning', 250, debugThemes.Grid, coords
     return null
+
 
 module.exports = Grid

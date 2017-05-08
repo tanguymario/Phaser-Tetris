@@ -5,6 +5,7 @@ GridTheme = require '../tetris/grid/grid-theme.coffee'
 
 PlayerHuman = require '../tetris/player/player-human.coffee'
 PlayerHumanConfig = require '../tetris/player/player-human-config.coffee'
+PlayerAI = require '../tetris/player/player-ai.coffee'
 
 Tetris = require '../tetris/tetris.coffee'
 
@@ -31,8 +32,8 @@ class Game extends Phaser.State
   create: ->
     debug 'Create...', @, 'info', 30, debugThemes.Phaser
 
-    mainPlayer = new PlayerHuman @game, @theme, PlayerHumanConfig.player1
-    tetrisGame = new Tetris @game, GridConfig.classic, mainPlayer
+    player1 = new PlayerHuman @game, @theme, PlayerHumanConfig.player2
+    tetrisGame = new Tetris @game, GridConfig.classic, player1
 
 
   toggleFullscreen: ->

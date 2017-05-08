@@ -22,17 +22,19 @@ class Tetris
 
     @game = game
     @players = players
+    @gridConfig = gridConfig
 
-    # TODO one player only for now
-    topLeftGame = new Coordinates 0, 0
-    gameRectangle = new Rectangle topLeftGame, @game.width, @game.height
+    layoutStepX = @game.width / @players.length
+    leftPoint = new Coordinates 0, 0
 
     # Grid creation (one player = one grid)
     for i in [0...@players.length] by 1
       player = players[i]
-      player.grid = new Grid @game, gameRectangle, gridConfig, player.theme
+      gameRectangle = new Rectangle leftPoint, layoutStepX, @game.height
+      player.grid = new Grid @game, gameRectangle, @gridConfig, player.theme
+      leftPoint.x += layoutStepX
 
-    @timer = @game.time.events.loop 200, @updateTetrisGame, @
+    @timer = @game.time.events.loop 1000, @updateTetrisGame, @
 
 
   updateTetrisGame: ->

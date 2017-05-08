@@ -10,7 +10,9 @@ class Polygon
     for i in [0...coordinates.length] by 1
       assert coordinates[i] instanceof Coordinates, "object specified is not of type \'Coordinates\'"
 
-    @points = coordinates
+    @points = new Array coordinates.length
+    for i in [0...coordinates.length] by 1
+      @points[i] = coordinates[i].clone()
 
 
   getPoint: (i) ->

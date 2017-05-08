@@ -44,13 +44,14 @@ class GridLayout
 
     topLeftViewX = gridView.getTopLeft().x + gridView.getWidth() / 2 - @width / 2
     topLeftViewY = gridView.getTopLeft().y
-    topLeftView = new Coordinates topLeftViewY, topLeftViewY
+    topLeftView = new Coordinates topLeftViewX, topLeftViewY
 
     @view = new Rectangle topLeftView, @width, @height
 
 
   updateCasesTransform: ->
     totalHeight = @config.size.h + @config.nbHiddenLines
+    scale = @caseSize / @grid.theme.spriteSize.w
     for i in [0...@config.size.w] by 1
       for j in [@config.nbHiddenLines...totalHeight] by 1
         coords = new Coordinates i, j
@@ -64,7 +65,6 @@ class GridLayout
         currentCase.sprite.y = coords.y
 
         # Scale
-        scale = @caseSize / @grid.theme.spriteSize.w
         currentCase.sprite.scale.setTo scale, scale
 
 
