@@ -13,12 +13,20 @@ debug       = require '../../utils/debug.coffee'
 debugThemes = require '../../utils/debug-themes.coffee'
 
 class Player
-  constructor: (game, gridTheme) ->
+  @V_DEF_INTERVAL = 1000
+  @V_DEF_ACCELERATION = 50
+
+  constructor: (game, gridTheme, sounds) ->
     assert game?, "Game missing"
+    assert gridTheme?, "GridTheme missing"
+    assert sounds?, "Sounds missing"
 
     @game = game
     @theme = gridTheme
+    @sounds = sounds
     @currentBlock = null
+
+    @timer = @game.time.events.loop Player.V_DEF_INTERVAL, @update, @
 
 
   generateBlock: ->
@@ -36,6 +44,7 @@ class Player
 
   rotate: (direction) ->
     @currentBlock.rotate direction
+    @game.sound.play @sounds.rotate.key
 
 
   moveLeft: ->
@@ -51,5 +60,34 @@ class Player
       return
 
     @currentBlock.move direction
+    @game.sound.play @sounds.move.key
+
+
+  startAccelerate: ->
+    @timer.delay = Player.V_DEF_ACCELERATION
+
+
+  endAccelerate: ->
+    @timer.delay = Player.V_DEF_INTERVAL
+
+
+  finish: ->
+    # TODO
+
+
+  end: ->
+    @timer.timer.destroy()
+    @game.sound.play @sounds.end.key
+    console.log "THE END"
+
+
+  update: ->
+    if not @currentBlock? or @currentBlock.fixed
+      @generateBlock()
+      if not @currentBlock.checkBlockIntegrity()
+        @end()
+    else
+      @currentBlock.update()
+
 
 module.exports = Player

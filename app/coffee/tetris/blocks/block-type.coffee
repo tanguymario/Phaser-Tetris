@@ -46,12 +46,6 @@ S = [
   [1, 1, 0],
 ]
 
-Q = [
-  [0, 0, 0],
-  [1, 1, 1],
-  [1, 0, 1]
-]
-
 module.exports = [
   {
     name: "I"
@@ -94,11 +88,5 @@ module.exports = [
     matrix: new Matrix S
     spriteFrame: BlockSprites.S_GREEN
     nbRotations: 1
-  },
-  {
-    name: "Q"
-    matrix: new Matrix Q
-    spriteFrame: BlockSprites.S_GREEN
-    nbRotations: 3
   }
 ]

@@ -34,15 +34,5 @@ class Tetris
       player.grid = new Grid @game, gameRectangle, @gridConfig, player.theme
       leftPoint.x += layoutStepX
 
-    @timer = @game.time.events.loop 1000, @updateTetrisGame, @
-
-
-  updateTetrisGame: ->
-    for player in @players
-      if not player.currentBlock? or player.currentBlock.fixed
-        player.generateBlock()
-      else
-        player.currentBlock.update()
-
 
 module.exports = Tetris

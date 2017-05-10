@@ -19,6 +19,8 @@ class Grid
   constructor: (game, rectangleView, gridConfig, gridTheme) ->
     assert game?, "Game missing"
     assert rectangleView instanceof Rectangle, "rectangleView missing"
+    assert gridConfig?, "GridConfig missing"
+    assert gridTheme?, "GridTheme missing"
 
     @game = game
     @config = gridConfig
