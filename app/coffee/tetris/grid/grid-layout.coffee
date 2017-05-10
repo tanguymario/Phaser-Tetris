@@ -28,7 +28,7 @@ class GridLayout
 
     caseColumnMax = viewMaxSize / gridConfig.size.w
     caseLineMax = viewMaxSize / gridConfig.size.h
-    caseMaxSize = Math.min caseColumnMax, caseLineMax
+    caseMaxSize = Math.min(caseColumnMax, caseLineMax) * 2
 
     return caseMaxSize
 
@@ -38,12 +38,15 @@ class GridLayout
     @grid = grid
     @config = gridConfig
 
+    # Max case size
     @caseSize = GridLayout.GetCaseSizeFromRect @config, gridView
+    @caseSize *= @config.casesScale
+
     @width = @caseSize * @config.size.w
     @height = @caseSize * @config.size.h
 
     topLeftViewX = gridView.getTopLeft().x + gridView.getWidth() / 2 - @width / 2
-    topLeftViewY = gridView.getTopLeft().y
+    topLeftViewY = gridView.getTopLeft().y + gridView.getHeight() / 2 - @height / 2
     topLeftView = new Coordinates topLeftViewX, topLeftViewY
 
     @view = new Rectangle topLeftView, @width, @height

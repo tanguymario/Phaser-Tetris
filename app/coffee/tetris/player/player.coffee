@@ -13,9 +13,6 @@ debug       = require '../../utils/debug.coffee'
 debugThemes = require '../../utils/debug-themes.coffee'
 
 class Player
-  @V_DEF_INTERVAL = 1000
-  @V_DEF_ACCELERATION = 50
-
   constructor: (game, gridTheme, sounds) ->
     assert game?, "Game missing"
     assert gridTheme?, "GridTheme missing"
@@ -23,15 +20,11 @@ class Player
 
     @game = game
     @theme = gridTheme
+
     @sounds = sounds
-    @currentBlock = null
-
-    @timer = @game.time.events.loop Player.V_DEF_INTERVAL, @update, @
-
-
-  generateBlock: ->
-    randBlockType = Block.GetRandomBlockType()
-    @currentBlock = new Block @game, @grid, randBlockType
+    for soundKey, soundValue of @sounds
+      soundValue.audio = @game.add.audio soundValue.key
+      soundValue.audio.volume = soundValue.volume
 
 
   rotateLeft: ->
@@ -42,11 +35,6 @@ class Player
     @rotate Direction.E
 
 
-  rotate: (direction) ->
-    @currentBlock.rotate direction
-    @game.sound.play @sounds.rotate.key
-
-
   moveLeft: ->
     @move Direction.W
 
@@ -55,39 +43,29 @@ class Player
     @move Direction.E
 
 
-  move: (direction) ->
-    if not @currentBlock?
-      return
+  ###
 
-    @currentBlock.move direction
-    @game.sound.play @sounds.move.key
+  Functions below will be defined by the grid associated to the player
+
+  ###
+  rotate: (direction) ->
+    undefined
+
+
+  move: (direction) ->
+    undefined
 
 
   startAccelerate: ->
-    @timer.delay = Player.V_DEF_ACCELERATION
+    undefined
 
 
   endAccelerate: ->
-    @timer.delay = Player.V_DEF_INTERVAL
+    undefined
 
 
   finish: ->
-    # TODO
-
-
-  end: ->
-    @timer.timer.destroy()
-    @game.sound.play @sounds.end.key
-    console.log "THE END"
-
-
-  update: ->
-    if not @currentBlock? or @currentBlock.fixed
-      @generateBlock()
-      if not @currentBlock.checkBlockIntegrity()
-        @end()
-    else
-      @currentBlock.update()
+    undefined
 
 
 module.exports = Player

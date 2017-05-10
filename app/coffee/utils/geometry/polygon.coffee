@@ -32,7 +32,7 @@ class Polygon
 
 
   toGraphics: (graphics) ->
-    assert graphics? and graphics instanceof Phaser.Graphics, "Graphics doesn't exist"
+    assert graphics instanceof Phaser.Graphics, "Graphics missing"
     assert @points.length > 0, "No Points to draw"
 
     firstPoint = @points[0]

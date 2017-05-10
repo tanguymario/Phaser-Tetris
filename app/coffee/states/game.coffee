@@ -23,16 +23,21 @@ class Game extends Phaser.State
     super
 
     @theme = GridTheme.rock_semi_transparent
-    @sounds = PlayerSounds.classic
+    @playerSounds = PlayerSounds.classic
+
+    @sounds =
+      music:
+        key: 'music-a-prehistoric-tale'
+        src: 'assets/snd/songs/A_Prehistoric_Tale.ogg'
+        volumne: 1
+      gameOver:
+        key: 'game-over'
+        src: 'assets/snd/songs/Jingle_Lose_00.mp3'
+        volume: 1
 
     @background =
       key: 'background-classic'
       src: 'assets/img/tetris/backgrounds/classic.jpg'
-
-    @music =
-      name: 'A prehistoric tale 7'
-      author: 'Madmax'
-      file: 'assets/snd/songs/A_Prehistoric_Tale_7.ym'
 
 
   preload: ->
@@ -43,14 +48,12 @@ class Game extends Phaser.State
     @game.load.spritesheet @theme.key, @theme.src, @theme.spriteSize.w, @theme.spriteSize.h
 
     # Snd - Song
-    @game.load.script 'YM', 'assets/plugins/YM.js'
-    @game.load.binary @music.name, @music.file
+    for soundKey, soundValue of @sounds
+      @game.load.audio soundValue.key, soundValue.src
 
     # Snd - Effects
-    @game.load.audio @sounds.move.key, @sounds.move.src
-    @game.load.audio @sounds.rotate.key, @sounds.rotate.src
-    @game.load.audio @sounds.end.key, @sounds.end.src
-    @game.load.audio @sounds.fixed.key, @sounds.fixed.src
+    for soundKey, soundValue of @playerSounds
+      soundValue.audio = @game.load.audio soundValue.key, soundValue.src
 
 
   create: ->
@@ -70,27 +73,16 @@ class Game extends Phaser.State
     @game.input.gamepad.start()
     pad1 = @game.input.gamepad.pad1
     pad2 = @game.input.gamepad.pad2
+    pad3 = @game.input.gamepad.pad3
+    pad4 = @game.input.gamepad.pad4
 
     # Create tetris game
-    player1 = new PlayerHuman @game, @theme, @sounds, PlayerHumanConfig.player1, pad1
-    player2 = new PlayerHuman @game, @theme, @sounds, PlayerHumanConfig.player2, pad2
+    player1 = new PlayerHuman @game, @theme, @playerSounds, PlayerHumanConfig.player1, pad1
+    player2 = new PlayerHuman @game, @theme, @playerSounds, PlayerHumanConfig.player2, pad2
+    player3 = new PlayerHuman @game, @theme, @playerSounds, PlayerHumanConfig.player2, pad2
+    player4 = new PlayerHuman @game, @theme, @playerSounds, PlayerHumanConfig.player2, pad2
 
-    tetrisGame = new Tetris @game, GridConfig.classic, player1, player2
-
-    # Start the main song
-    @startSong()
-
-
-  startSong: ->
-    data = @game.cache.getBinary @music.name
-    if not @ym
-      @ym = new YM data
-    else
-      @ym.stop()
-      @ym.clearsong()
-      @ym.parse data
-
-    @ym.play()
+    tetrisGame = new Tetris @game, GridConfig.classic, @sounds, player1, player2, player3, player4
 
 
   toggleFullscreen: ->

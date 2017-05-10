@@ -2,6 +2,8 @@ GridConfig = require './grid-config.coffee'
 GridTheme = require './grid-theme.coffee'
 GridLayout = require './grid-layout.coffee'
 
+Block = require '../blocks/block.coffee'
+
 Case = require './case.coffee'
 CaseSprite = require './case-sprite.coffee'
 
@@ -16,19 +18,27 @@ debug       = require '../../utils/debug.coffee'
 debugThemes = require '../../utils/debug-themes.coffee'
 
 class Grid
-  constructor: (game, rectangleView, gridConfig, gridTheme) ->
+
+  @V_SPEED_START = 1000
+  @V_SPEED_MAX = 50
+
+  @V_SPEED_STEP = -25
+
+  constructor: (game, tetris, player, rectangleView, gridConfig) ->
     assert game?, "Game missing"
+    assert player?, "Player missing"
     assert rectangleView instanceof Rectangle, "rectangleView missing"
     assert gridConfig?, "GridConfig missing"
-    assert gridTheme?, "GridTheme missing"
 
     @game = game
+    @tetris = tetris
+    @player = player
     @config = gridConfig
-    @theme = gridTheme
+    @theme = @player.theme
+    @finished = false
+    @speed = Grid.V_SPEED_START
 
-    @layout = new GridLayout @game, @, rectangleView, @config
-
-    # Grid initialization
+    # Grid matrix initialization
     nbLines = @config.size.h + @config.nbHiddenLines
     tab = new Array nbLines
     for i in [0...nbLines] by 1
@@ -40,12 +50,111 @@ class Grid
           tab[i][j] = new CaseSprite @game, @, coords, @theme
         else
           tab[i][j] = new Case @game, @, coords, @theme
-
     @matrix = new Matrix tab
 
+    # Grid was initialized, we can set the layout now
+    @layout = new GridLayout @game, @, rectangleView, @config
     @layout.updateCasesTransform()
 
+    # Assign player functions
+    @player.move = @move
+    @player.rotate = @rotate
+    @player.startAccelerate = @startAccelerate
+    @player.endAccelerate = @endAccelerate
+    @player.finish = @finish
 
+    # Create and start timer
+    @timer = @game.time.create false
+    @initTimer()
+
+    # Start with the next block
+    @switchToNextBlock()
+
+
+  initTimer: ->
+    @timer.stop()
+    @timer.loop @speed, @update, @
+    @timer.start()
+
+
+  checkCurrentBlock: ->
+    return @currentBlock? and not @currentBlock.fixed
+
+
+  # Generate a new random block
+  generateBlock: ->
+    randBlockType = Block.GetRandomBlockType()
+    @currentBlock = new Block @game, @, randBlockType
+
+
+  # Move the current block
+  move: (direction) =>
+    if not @checkCurrentBlock()
+      return
+
+    @currentBlock.move direction
+    @player.sounds.move.audio.play()
+
+
+  # Rotate the current block
+  rotate: (direction) =>
+    if not @checkCurrentBlock()
+      return
+
+    @currentBlock.rotate direction
+    @player.sounds.rotate.audio.play()
+
+
+  # Starts the acceleration
+  startAccelerate: () =>
+    if not @checkCurrentBlock()
+      return
+
+    @timer.stop()
+    @timer.loop Grid.V_SPEED_MAX, @update, @
+    @timer.start()
+
+
+  # End the acceleration
+  endAccelerate: () =>
+    if not @checkCurrentBlock()
+      return
+
+    @initTimer()
+
+
+  # Finish the current block
+  finish: =>
+    if not @checkCurrentBlock()
+      return
+
+    # TODO
+
+
+  # Game over
+  end: ->
+    @finished = true
+    @currentBlock = null
+    @timer.stop()
+    @player.sounds.end.audio.play()
+    @tetris.triggerGridEnd(@)
+
+
+  # The update function
+  update: ->
+    if @checkCurrentBlock()
+      @currentBlock.update()
+
+
+  # Sets the next block
+  switchToNextBlock: ->
+    @generateBlock()
+    if not @currentBlock.checkBlockIntegrity()
+      @currentBlock.fixed = true
+      @end()
+
+
+  # Returns lines which are complete (blocks)
   checkCompleteLines: (block) ->
     completeLineIndexes = new Array()
 
@@ -61,7 +170,11 @@ class Grid
     return completeLineIndexes.reverse()
 
 
+  # Remove complete lines from the block which was fixed
   removeCompleteLines: (block) ->
+    @player.sounds.fixed.audio.play()
+    @switchToNextBlock()
+
     lineIndexes = @checkCompleteLines block
     if lineIndexes.length <= 0
       return
@@ -87,7 +200,12 @@ class Grid
 
     @resetLine currentLineIndex
 
+    # Increase speed
+    @speed += lineIndexes.length * Grid.V_SPEED_STEP
+    @initTimer()
 
+
+  # Resets / Clears the line by resetting all cases on this line
   resetLine: (lineIndex) ->
     assert lineIndex >= 0 and lineIndex < @matrix.height, "Line out of bounds"
     for i in [0...@matrix.width] by 1
@@ -96,6 +214,7 @@ class Grid
       currCase.reset()
 
 
+  # Copy a line to another
   copyLineTo: (sourceLine, targetLine) ->
     for i in [0...@matrix.width] by 1
       sourceCoords = new Coordinates i, sourceLine
@@ -113,6 +232,7 @@ class Grid
         targetCase.sprite.frame = sourceCase.sprite.frame
 
 
+  # Is line empty ?
   isLineEmpty: (lineIndex) ->
     for i in [0...@matrix.width] by 1
       gridCoords = new Coordinates i, lineIndex
@@ -122,6 +242,7 @@ class Grid
     return true
 
 
+  # Is the line complete ?
   isLineCompleteAt: (lineIndex) ->
     for i in [0...@matrix.width] by 1
       gridCoords = new Coordinates i, lineIndex
@@ -131,6 +252,7 @@ class Grid
     return true
 
 
+  # Return the case at game coords
   getCaseAtGameCoords: (coords) ->
     debug 'getCaseAtGameCoords...', @, 'info', 100, debugThemes.Grid
     if @layout.view.isInside coords, false
@@ -144,6 +266,7 @@ class Grid
     return null
 
 
+  # Return a case in at grid coords
   getCaseAtGridCoords: (coords) ->
     assert coords instanceof Coordinates, "Coords missing"
 
