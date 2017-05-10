@@ -1,5 +1,5 @@
 module.exports =
-  width: 750
-  height: 750
+  width: 1800
+  height: 900
   pack: 'assets/pack.json'
   canvasId: 'game-stage'

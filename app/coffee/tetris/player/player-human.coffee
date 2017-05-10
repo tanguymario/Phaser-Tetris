@@ -7,7 +7,7 @@ debug       = require '../../utils/debug.coffee'
 debugThemes = require '../../utils/debug-themes.coffee'
 
 class PlayerHuman extends Player
-  constructor: (game, gridTheme, sounds, playerConfig) ->
+  constructor: (game, gridTheme, sounds, playerConfig, gamepad = null) ->
     super game, gridTheme, sounds
 
     @config = playerConfig
@@ -28,11 +28,10 @@ class PlayerHuman extends Player
     @keys.accelerate.onUp.add @endAccelerate, @
     @keys.finish.onDown.add @finish, @
 
-    if @game.input.gamepad.supported
-      pad = @game.input.gamepad
-      pad.start()
-      pad.onDownCallback = @gamepadOnDownHandler
-      pad.onUpCallback = @gamepadOnUpHandler
+    if @game.input.gamepad.supported and gamepad?
+      @gamepad = gamepad
+      @gamepad.onDownCallback = @gamepadOnDownHandler
+      @gamepad.onUpCallback = @gamepadOnUpHandler
 
 
   gamepadOnUpHandler: (button) =>

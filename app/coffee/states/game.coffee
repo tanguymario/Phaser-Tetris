@@ -8,6 +8,8 @@ PlayerHumanConfig = require '../tetris/player/player-human-config.coffee'
 PlayerAI = require '../tetris/player/player-ai.coffee'
 PlayerSounds = require '../tetris/player/player-sounds.coffee'
 
+Coordinates = require '../utils/coordinates.coffee'
+
 Tetris = require '../tetris/tetris.coffee'
 
 config      = require '../config/config.coffee'
@@ -56,14 +58,24 @@ class Game extends Phaser.State
 
     # Background
     @background.sprite = @game.add.sprite 0, 0, @background.key
-    @background.sprite.scale.setTo @game.width / @background.sprite.width, @game.height / @background.sprite.height
+    bgScale = new Coordinates 0, 0
+    bgScale.x = @game.width / @background.sprite.width
+    bgScale.y = @game.height / @background.sprite.height
+    @background.sprite.scale.setTo bgScale.x, bgScale.y
 
     # Fullscreen
     @game.input.onDown.add @toggleFullscreen, @
 
+    # Pads for players
+    @game.input.gamepad.start()
+    pad1 = @game.input.gamepad.pad1
+    pad2 = @game.input.gamepad.pad2
+
     # Create tetris game
-    player1 = new PlayerHuman @game, @theme, @sounds, PlayerHumanConfig.player2
-    tetrisGame = new Tetris @game, GridConfig.classic, player1
+    player1 = new PlayerHuman @game, @theme, @sounds, PlayerHumanConfig.player1, pad1
+    player2 = new PlayerHuman @game, @theme, @sounds, PlayerHumanConfig.player2, pad2
+
+    tetrisGame = new Tetris @game, GridConfig.classic, player1, player2
 
     # Start the main song
     @startSong()
